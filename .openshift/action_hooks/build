@@ -1,0 +1,72 @@
+#!/bin/bash
+# This is a simple build script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the deploy step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+#  Setup locale
+export LC_ALL="en_US.UTF-8"
+
+# Python 3.3 doesn't come with activate_this.py, create it
+if [ ! -f $VIRTUAL_ENV/bin/activate_this.py ]
+then
+    cat > $VIRTUAL_ENV/bin/activate_this.py << EOF
+"""By using execfile(this_file, dict(__file__=this_file)) you will
+activate this virtualenv environment.
+
+This can be used when you must use an existing Python interpreter, not
+the virtualenv bin/python
+"""
+
+try:
+    __file__
+except NameError:
+    raise AssertionError(
+        "You must run this like execfile('path/to/activate_this.py', dict(__file__='path/to/activate_this.py'))")
+import sys
+import os
+
+old_os_path = os.environ['PATH']
+os.environ['PATH'] = os.path.dirname(os.path.abspath(__file__)) + os.pathsep + old_os_path
+base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if sys.platform == 'win32':
+    site_packages = os.path.join(base, 'Lib', 'site-packages')
+else:
+    site_packages = os.path.join(base, 'lib', 'python%s' % sys.version[:3], 'site-packages')
+prev_sys_path = list(sys.path)
+import site
+site.addsitedir(site_packages)
+sys.real_prefix = sys.prefix
+sys.prefix = base
+# Move the added items to the front of the path:
+new_sys_path = []
+for item in list(sys.path):
+    if item not in prev_sys_path:
+        new_sys_path.append(item)
+        sys.path.remove(item)
+sys.path[:0] = new_sys_path
+EOF
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/static ]; then
+    mkdir $OPENSHIFT_DATA_DIR/static
+fi
+
+if [ -d $OPENSHIFT_REPO_DIR/wsgi/static ]; then
+    rm -rf $OPENSHIFT_REPO_DIR/wsgi/static
+fi
+
+ln -sf $OPENSHIFT_DATA_DIR/static $OPENSHIFT_REPO_DIR/wsgi/static
+
+# Make the media directory available for the application
+
+if [ ! -d $OPENSHIFT_DATA_DIR/media ]; then
+    mkdir $OPENSHIFT_DATA_DIR/media
+fi
+
+ln -sf $OPENSHIFT_DATA_DIR/media $OPENSHIFT_DATA_DIR/static/media
+
+# set DJANGO security configuration keys randomly
+
+export DJANGO_SECRET_KEY=$(LC_CTYPE=C tr -dc "a-zA-Z0-9-" < /dev/urandom | head -c  64)
+export DJANGO_NEVERCACHE_KEY=$(LC_CTYPE=C tr -dc "a-zA-Z0-9-" < /dev/urandom | head -c  64)

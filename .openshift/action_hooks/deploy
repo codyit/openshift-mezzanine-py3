@@ -1,0 +1,16 @@
+#!/bin/bash
+# This deploy hook gets executed after dependencies are resolved and the
+# build hook has been run but before the application has been started back
+# up again.  This script gets executed directly, so it could be python, php,
+# ruby, etc.
+
+source $VIRTUAL_ENV/bin/activate
+
+
+if (( $(psql $PGDATABASE -c '\dt' | grep -c 'No relations found.') == 0 )); then  
+    echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py syncdb --noinput'"
+    python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py syncdb --noinput
+
+    echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py collectstatic --noinput'"
+    python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py collectstatic --noinput
+fi
