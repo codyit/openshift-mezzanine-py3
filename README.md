@@ -46,6 +46,7 @@ Plase ommit this step for subsequence pushes
     rhc ssh blog 
     source $VIRTUAL_ENV/bin/activate
     python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py flush
+    python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py migrate --fake
 
 What's in it
 ------------
