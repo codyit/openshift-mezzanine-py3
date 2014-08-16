@@ -7,5 +7,6 @@ setup(name='Mezzanine', version='1.0',
       url='http://blog-codyit.rhcloud.com',
       install_requires= [
           'Mezzanine==3.1.9',
+          'South==1.0',
       ],
      )

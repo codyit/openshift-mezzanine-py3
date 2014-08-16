@@ -6,11 +6,11 @@
 
 source $VIRTUAL_ENV/bin/activate
 
+echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py syncdb --noinput'"
+python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py syncdb --noinput
 
-if (( $(psql $PGDATABASE -c '\dt' | grep -c 'No relations found.') == 0 )); then  
-    echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py syncdb --noinput'"
-    python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py syncdb --noinput
+echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py migrate --noinput'"
+python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py migrate --noinput
 
-    echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py collectstatic --noinput'"
-    python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py collectstatic --noinput
-fi
+echo "Executing 'python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py collectstatic --noinput'"
+python "$OPENSHIFT_REPO_DIR"wsgi/approot/manage.py collectstatic --noinput

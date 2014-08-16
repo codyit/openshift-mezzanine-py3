@@ -40,13 +40,12 @@ Push to openshift
 
     git push
     
-Then run this to create the initial tables and superuser. Follow the prompt, say no to demo page creation because of a bug.
+Run this to flush the database and create superuser. Follow the prompt, say no to demo page creation because of a bug.
+Plase ommit this step for subsequence pushes
 
     rhc ssh blog 
     source $VIRTUAL_ENV/bin/activate
-    python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py createdb
-    python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py collectstatic --noinput
-
+    python $OPENSHIFT_REPO_DIR/wsgi/approot/manage.py flush
 
 What's in it
 ------------
