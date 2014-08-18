@@ -41,7 +41,7 @@ Push to openshift
     git push
     
 Run this to flush the database and create superuser. Follow the prompt, say no to demo page creation because of a bug.
-Plase ommit this step for subsequence pushes
+Please ommit this step for subsequence pushes
 
     rhc ssh blog 
     source $VIRTUAL_ENV/bin/activate
